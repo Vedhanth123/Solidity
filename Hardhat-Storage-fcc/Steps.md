@@ -38,3 +38,5 @@ Step 7: Run hardhat
 ```shell
 npx hardhat run .\scripts\deploy.js --network <network-name>
 ```
+
+Steps 8: You can create custom tasks in .\tasks folder

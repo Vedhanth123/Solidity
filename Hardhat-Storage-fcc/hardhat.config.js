@@ -3,6 +3,7 @@ require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require("@nomiclabs/hardhat-etherscan");
 require("solidity-coverage");
+require(".\\tasks\\block-number");
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -15,8 +16,6 @@ const GOERLI_RPC_URL =
 const PRIVATE_KEY =
 	"418d6b508ff8edbfd088ce53d1102b0f14225a59f3af9a7741ad20425f900d24";
 const ETHERSCAN_API_KEY = "23API9JW6MHWKTCIJ73ZC1D94EEPBAG526";
-
-console.log(GOERLI_RPC_URL);
 
 module.exports = {
 	defaultNetwork: "hardhat",
