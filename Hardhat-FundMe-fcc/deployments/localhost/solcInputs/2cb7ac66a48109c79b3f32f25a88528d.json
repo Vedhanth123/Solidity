@@ -1,0 +1,38 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/FundMe.sol": {
+      "content": "// SPDX-License-Identifier: MIT\r\n\r\n// Contract which does these things:\r\n// 1) Users send ether into this contract to store their ether\r\n// 2) Owner can withdraw the amount\r\n// 3) Users can take their ether back from this contract\r\n\r\npragma solidity ^0.8.0;\r\n\r\nimport \"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol\";\r\n\r\ncontract FundMe {\r\n\r\n    address public immutable Owner;\r\n    address[] public Users;\r\n    mapping (address => uint) public AddressToValue;\r\n    int256 public minimumWei;\r\n    AggregatorV3Interface contractInstance;\r\n\r\n    // Constructor which acts when the contract is being deployed and stores the address of the Owner in a variable\r\n    constructor(address contractAddress) {\r\n        Owner = payable(msg.sender);\r\n        contractInstance = AggregatorV3Interface(contractAddress);\r\n    }\r\n\r\n    // 1) Users send ether into this contract\r\n    function sendEth () public payable returns (string memory) {\r\n\r\n        // We are setting the minimum amount that a user need to send to this contract\r\n        require(msg.value >= uint(minimumWei), \"Eth amount too low!\");\r\n        \r\n        // Storing the users addresses in an array\r\n        Users.push(msg.sender);\r\n\r\n        return \"Eth sent successfully!\";\r\n    } \r\n\r\n    // 2) Owner can withdraw the amount\r\n    function OwnerWithdraw () public payable {\r\n\r\n        // Only the Owner can withdraw the amount\r\n        require(msg.sender == Owner, \"You cannot withdraw all the funds only Owner can withdraw all the funds\");\r\n\r\n        // To send Eth from contract to the Owner use call method\r\n        // convert address of the Owner to payable\r\n        (bool success, bytes memory data) = Owner.call{value: address(this).balance}(\"\");\r\n\r\n        // We then update the balances of all the users in the contract\r\n        for (uint i = 0; i < Users.length; i++) {\r\n            AddressToValue[Users[i]] = 0;\r\n        }\r\n\r\n    }\r\n\r\n    // 3) Users can take their money back from this contract\r\n    function userWithdraw () public {\r\n\r\n        // Convert the user address to payable address\r\n        address UserAddress = msg.sender;\r\n        (bool success, bytes memory data) = UserAddress.call{value: AddressToValue[UserAddress]}(\"\");\r\n\r\n    }\r\n\r\n    // function which gets data about value of ETH for 10$\r\n    function getValueOfEth() public payable {\r\n        (\r\n            ,\r\n            int256 _answer,\r\n            ,\r\n            ,\r\n            \r\n        ) = contractInstance.latestRoundData();\r\n        minimumWei = _answer / (10 ** 8);\r\n        minimumWei = (10**18) * 10/minimumWei;\r\n    }\r\n}"
+    },
+    "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface AggregatorV3Interface {\n  function decimals() external view returns (uint8);\n\n  function description() external view returns (string memory);\n\n  function version() external view returns (uint256);\n\n  // getRoundData and latestRoundData should both raise \"No data present\"\n  // if they do not have data to report, instead of returning unset values\n  // which could be misinterpreted as actual reported values.\n  function getRoundData(uint80 _roundId)\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n\n  function latestRoundData()\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
