@@ -19,7 +19,7 @@ contract FundMe {
 
     // Constructor which acts when the contract is being deployed and stores the address of the Owner in a variable
     constructor(address contractAddress) {
-        Owner = payable(msg.sender);
+        Owner = payable(msg.sender); 
         contractInstance = AggregatorV3Interface(contractAddress);
     }
 

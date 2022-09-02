@@ -3,7 +3,7 @@ const { getNamedAccounts } = require("hardhat");
 const {
 	isCallTrace,
 } = require("hardhat/internal/hardhat-network/stack-traces/message-trace");
-const { assert } = require("chai");
+const { assert, expect } = require("chai");
 /**
  * @abstract: This file is used to test smart contracts in a local environment
  */
@@ -20,7 +20,9 @@ describe("FundMe", async function() {
 	 * beforeEach is basically used to initialize the smart contract and taking into consideration of things which are needed for smart contract to run
 	 */
 	beforeEach(async function() {
+		// fetching deployer
 		deployer = (await getNamedAccounts()).deployer;
+		// This line allows us to use all smart contracts from the deployments folder
 		await deployments.fixture(["all"]);
 		// Fetching FundMe and MockV3Aggregrator from the deployments folder
 		FundMe = await ethers.getContract("FundMe", deployer);
@@ -42,6 +44,19 @@ describe("FundMe", async function() {
 			const response = await FundMe.contractInstance();
 			// Checking whether the Chainlink oracle's contract address stored in the constructor is equal to actual contract address
 			assert.equal(response, MockV3Aggregator.address);
+		});
+
+		/**
+		 * Check whether the owner address is stored correctly or not
+		 */
+		it("sets the owner address correctly", async function() {
+			const ownerStored = await FundMe.Owner();
+			assert.equal(ownerStored, deployer);
+		});
+	});
+	describe("sendEth", async function() {
+		it("Checks whether if contract gets executed if person sends low ETH", async function() {
+			await FundMe.sendEth();
 		});
 	});
 });
